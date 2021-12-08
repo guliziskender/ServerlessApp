@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo install serverless framework
+      - npm install node@12
+      - node -v
+      - npm install -g serverless@2.67.0
+  pre_build:
+    commands:
+      - echo install pre build commands
+      - npm install
+  build:
+    commands:
+      - echo deployment started 
+      - echo deploy serverless framework custom codebase
+      - sls deploy
+  post_build:
+    commands:
+      - echo post build completed

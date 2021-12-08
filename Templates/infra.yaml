@@ -1,0 +1,112 @@
+#get source code from git
+#go to codebuild and run the serverless commands
+#create permissions 
+
+
+Description: ServerlessApp Stack
+
+Parameters:
+
+    Prefix:
+        Type: String
+        Default: serverlessapp3680
+
+    Environment:
+        Type: String
+        Default: production
+
+    GitConnection:
+        Type: String
+        Default: arn:aws:codestar-connections:us-east-1:302577578531:connection/55b5164d-73cd-4059-91df-608bae63a4d4
+
+    Branch:
+        Type: String
+        Default: master
+
+    GitRepo:
+        Type: String
+        Default: ServerlessApp
+
+    GitBranch:
+        Type: String
+        Default: master
+
+    GitUser:
+        Type: String
+        Default: guliziskender
+
+    GitToken:
+        Type: String
+        Default: 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
+
+Resources:
+
+    Pipeline:
+        Type: AWS::CodePipeline::Pipeline
+        Properties:
+            Name: ServerlessApp
+            RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/${Prefix}-codepipeline
+            ArtifactStore:
+                Type: S3
+                Location: !Sub ${Prefix}-${Environment}-artifacts
+            Stages:
+              - Name: Source
+                Actions:
+                  - Name: Templates
+                    RunOrder: 1
+                    OutputArtifacts:
+                    - Name: codebase
+                    ActionTypeId:
+                        Category: Source
+                        Owner: ThirdParty
+                        Provider: GitHub
+                        Version: '1'
+                    Configuration:
+                        Repo: !Ref GitRepo
+                        Branch: !Ref GitBranch
+                        PollForSourceChanges: true
+                        Owner: !Ref GitUser
+                        OAuthToken: !Ref GitToken
+                    OutputArtifacts:
+                      - Name: templates
+              - Name: Build
+                Actions:
+                  - Name: Build
+                    ActionTypeId:
+                      Category: Build
+                      Owner: AWS
+                      Provider: CodeBuild
+                      Version: '1'
+                    Configuration:
+                      ProjectName: !Sub ServerlessApp
+                    InputArtifacts:
+                      - Name: templates
+                    OutputArtifacts:
+                      - Name: build
+                    RunOrder: '1'
+    CodeBuildProject:
+        Type: AWS::CodeBuild::Project
+        Properties:
+            Name: !Sub ServerlessApp
+            Source:
+                Type: GITHUB
+                Location: https://github.com/guliziskender/ServerlessApp
+            Artifacts:
+                Type: NO_ARTIFACTS
+            Triggers:
+                Webhook: true
+                FilterGroups:
+                    - - Type: HEAD_REF
+                        Pattern: !Sub refs/heads/${Branch}$
+                      - Type: EVENT
+                        Pattern: PUSH
+            Environment:
+                Type: LINUX_CONTAINER
+                Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+                ComputeType: BUILD_GENERAL1_SMALL
+            ServiceRole: !Sub arn:aws:iam::${AWS::AccountId}:role/${Prefix}-codebuild
+
+Outputs:
+
+    URL:
+        Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${Pipeline}

@@ -1,0 +1,70 @@
+Description: Serverless App
+
+Parameters:
+
+    Prefix:
+        Type: String
+
+    Environment:
+        Type: String
+
+Resources:
+
+    #== S3 ==#
+
+    ArtifactsBucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: !Sub ${Prefix}-${Environment}-artifacts
+
+    #== IAM ==#
+
+    CodePipelineRole:
+        Type: AWS::IAM::Role
+        Properties:
+            Path: /
+            RoleName: !Sub ${Prefix}-codepipeline
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                  - Effect: Allow
+                    Principal:
+                        Service: codepipeline.amazonaws.com
+                    Action: sts:AssumeRole
+            ManagedPolicyArns:
+            - arn:aws:iam::aws:policy/AdministratorAccess
+
+    CodeBuildRole:
+        Type: AWS::IAM::Role
+        Properties:
+            Path: /
+            RoleName: !Sub ${Prefix}-codebuild
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                  - Effect: Allow
+                    Principal:
+                        Service: codebuild.amazonaws.com
+                    Action: sts:AssumeRole
+            Policies:
+              - PolicyName: CodeBuildPolicy
+                PolicyDocument:
+                    Version: '2012-10-17'
+                    Statement:
+                      - Effect: Allow
+                        Action: ssm:GetParameters
+                        Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/CodeBuild/*
+                      - Effect: Allow
+                        Action:
+                        - iam:*
+                        - lambda:*
+                        - s3:*
+                        - cloudwatch:*
+                        - cloudformation:*
+                        - codebuild:*
+                        - logs:*
+                        - ec2:*
+                        - apigateway:*
+                        - dynamodb:*
+                        - events:*
+                        Resource: '*'
