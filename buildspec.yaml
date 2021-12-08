@@ -10,7 +10,7 @@ phases:
   pre_build:
     commands:
       - echo install pre build commands
-      - npm install
+      - npm install --unsafe-perm
   build:
     commands:
       - echo deployment started 
