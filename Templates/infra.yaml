@@ -39,6 +39,9 @@ Parameters:
         Type: String
         Default: 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
 
+    Url:
+        Type: String
+
 Resources:
 
     Pipeline:
@@ -90,7 +93,7 @@ Resources:
             Name: !Sub ServerlessApp
             Source:
                 Type: GITHUB
-                Location: https://github.com/guliziskender/ServerlessApp
+                Location: !Ref Url
             Artifacts:
                 Type: NO_ARTIFACTS
             Triggers:
