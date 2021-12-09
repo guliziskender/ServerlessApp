@@ -1,6 +1,6 @@
 # ServerlessApp
 
-Hello. You can find a simple serverless application and CI/CD infrastructure templates in this repository.
+Hello. You can find a simple serverless application which gets the data from a S3 bucket and puts it into DynamoDB and CI/CD infrastructure templates in this repository.
 
 Lambda function can be triggered by uploading a .csv file into the S3 bucket which is named "bucket-csv". Function processes the .csv file and send it to DynamoDB.
 
