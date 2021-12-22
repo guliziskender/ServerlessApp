@@ -17,7 +17,7 @@ Parameters:
 
     GitConnection:
         Type: String
-        Default: arn:aws:codestar-connections:us-east-1:302577578531:connection/55b5164d-73cd-4059-91df-608bae63a4d4
+        Default: <ConnectionCodeStart>
 
     Branch:
         Type: String
